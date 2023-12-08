@@ -1,0 +1,35 @@
+version: "3.1"
+services:
+  postgres:
+    image: postgres:15.5-alpine3.18
+    container_name: postgres
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: "${DATABASE_USER}"
+      POSTGRES_PASSWORD: "${DATABASE_SECRET}"
+      POSTGRES_DB: greenlight
+    networks:
+      - greenlight_local
+    platform: linux/amd64
+
+  adminer:
+    image: michalhosna/adminer:latest
+    container_name: adminer
+    depends_on:
+      - postgres
+    environment:
+      ADMINER_DB: greenlight
+      ADMINER_DRIVER: pgsql
+      ADMINER_PASSWORD: "${DATABASE_SECRET}"
+      ADMINER_SERVER: postgres
+      ADMINER_USERNAME: "${DATABASE_USER}"
+    platform: linux/amd64
+    networks:
+      - greenlight_local
+    ports:
+      - 9000:8080
+    volumes:
+      - ./assets/adminer.css:/var/adminer/adminer.css
+networks:
+  greenlight_local:
